@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz de Python</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        .quiz-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .question {
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+        }
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .option {
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .option:hover {
+            background-color: #e9ecef;
+        }
+        .selected {
+            background-color: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+        .correct {
+            background-color: #28a745;
+            color: white;
+            border-color: #28a745;
+        }
+        .incorrect {
+            background-color: #dc3545;
+            color: white;
+            border-color: #dc3545;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 5px;
+            text-align: center;
+            font-size: 1.2em;
+        }
+        .hidden {
+            display: none;
+        }
+        .explanation {
+            margin-top: 10px;
+        }
+        .explanation p {
+            color: #721c24;
+            background-color: #f8d7da;
+            padding: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <h1>🐍 Quiz de Python</h1>
+        <div id="quiz">
+            <!-- Las preguntas se cargarán aquí -->
+        </div>
+        <button id="submit" onclick="checkAnswers()">Verificar Respuestas</button>
+        <button id="restart" onclick="restartQuiz()" class="hidden">Reiniciar Quiz</button>
+        <div id="result" class="hidden"></div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "¿Qué tipo de dato es: nombre = 'Python'?",
+                options: [
+                    "Integer (número entero)",
+                    "Float (número decimal)",
+                    "String (texto)"
+                ],
+                correct: 2,
+                explanation: "Cuando un valor está entre comillas ('') o (\"\"), siempre es un String (texto). Los números no llevan comillas."
+            },
+            {
+                question: "¿Cuántas veces se ejecutará: for i in range(4)?",
+                options: [
+                    "3 veces",
+                    "4 veces",
+                    "5 veces"
+                ],
+                correct: 1,
+                explanation: "range(4) genera números del 0 al 3, por lo tanto el bucle se ejecutará 4 veces (0, 1, 2, 3)."
+            },
+            {
+                question: "¿Qué hace la función len() en Python?",
+                options: [
+                    "Convierte a minúsculas",
+                    "Calcula la longitud",
+                    "Ordena una lista"
+                ],
+                correct: 1,
+                explanation: "len() es una función que devuelve la longitud (número de elementos) de un objeto como una lista, string o diccionario."
+            },
+            {
+                question: "¿Cuál es el resultado de: 15 % 4?",
+                options: [
+                    "3.75",
+                    "3",
+                    "4"
+                ],
+                correct: 1,
+                explanation: "El operador % (módulo) devuelve el resto de la división. 15 dividido entre 4 es 3 con resto 3, por lo tanto 15 % 4 = 3."
+            },
+            {
+                question: "¿Qué hace el método .append() en una lista?",
+                options: [
+                    "Elimina elementos",
+                    "Agrega un elemento al final",
+                    "Ordena la lista"
+                ],
+                correct: 1,
+                explanation: "El método .append() agrega un elemento al final de una lista. Por ejemplo: lista.append(5) agregará el número 5 al final de la lista."
+            },
+            {
+                question: "¿Cómo se crea una lista vacía en Python?",
+                options: [
+                    "list()",
+                    "[]",
+                    "Ambas son correctas"
+                ],
+                correct: 2,
+                explanation: "En Python, puedes crear una lista vacía tanto con list() como con []. Ambas formas son válidas y producen el mismo resultado."
+            },
+            {
+                question: "¿Qué hace la función input()?",
+                options: [
+                    "Muestra texto en pantalla",
+                    "Lee entrada del usuario",
+                    "Limpia la pantalla"
+                ],
+                correct: 1,
+                explanation: "input() es una función que pausa el programa y espera a que el usuario escriba algo y presione Enter. Lo que el usuario escribe se devuelve como un string."
+            },
+            {
+                question: "¿Cuál es el resultado de: 'Hola' * 3?",
+                options: [
+                    "HolaHolaHola",
+                    "Error",
+                    "Hola3"
+                ],
+                correct: 0,
+                explanation: "En Python, puedes multiplicar un string por un número. Esto repite el string ese número de veces. Por lo tanto, 'Hola' * 3 = 'HolaHolaHola'."
+            },
+            {
+                question: "¿Qué significa el operador ==?",
+                options: [
+                    "Asignación",
+                    "Comparación de igualdad",
+                    "División"
+                ],
+                correct: 1,
+                explanation: "El operador == compara si dos valores son iguales. No confundir con = que es para asignación. Por ejemplo: if x == 5 compara si x es igual a 5."
+            },
+            {
+                question: "¿Qué tipo de dato es: True?",
+                options: [
+                    "String",
+                    "Integer",
+                    "Boolean"
+                ],
+                correct: 2,
+                explanation: "True es un valor booleano (Boolean). Los booleanos solo pueden tener dos valores: True o False, y se usan para operaciones lógicas y condiciones."
+            }
+        ];
+
+        let selectedAnswers = new Array(questions.length).fill(-1);
+
+        function createQuiz() {
+            const quizDiv = document.getElementById('quiz');
+            questions.forEach((q, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'question';
+                questionDiv.innerHTML = `
+                    <p><strong>Pregunta ${index + 1}:</strong> ${q.question}</p>
+                    <div class="options">
+                        ${q.options.map((option, i) => `
+                            <div class="option" onclick="selectOption(${index}, ${i})" id="q${index}o${i}">
+                                ${option}
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                quizDiv.appendChild(questionDiv);
+            });
+        }
+
+        function selectOption(questionIndex, optionIndex) {
+            // Desseleccionar opción anterior
+            const previousOption = document.querySelector(`#q${questionIndex}o${selectedAnswers[questionIndex]}`);
+            if (previousOption) {
+                previousOption.classList.remove('selected');
+            }
+            
+            // Seleccionar nueva opción
+            const option = document.querySelector(`#q${questionIndex}o${optionIndex}`);
+            option.classList.add('selected');
+            selectedAnswers[questionIndex] = optionIndex;
+        }
+
+        function checkAnswers() {
+            let score = 0;
+            questions.forEach((q, index) => {
+                const selectedOption = document.querySelector(`#q${index}o${selectedAnswers[index]}`);
+                if (selectedOption) {
+                    if (selectedAnswers[index] === q.correct) {
+                        selectedOption.classList.add('correct');
+                        score++;
+                    } else {
+                        selectedOption.classList.add('incorrect');
+                        const correctOption = document.querySelector(`#q${index}o${q.correct}`);
+                        correctOption.classList.add('correct');
+                        
+                        // Agregar explicación
+                        const explanationDiv = document.createElement('div');
+                        explanationDiv.className = 'explanation';
+                        explanationDiv.innerHTML = `<p style="color: #721c24; background-color: #f8d7da; padding: 10px; border-radius: 5px; margin-top: 10px;">
+                            <strong>Explicación:</strong> ${q.explanation}
+                        </p>`;
+                        correctOption.parentNode.appendChild(explanationDiv);
+                    }
+                }
+            });
+
+            const percentage = (score / questions.length) * 100;
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = `
+                <h2>Resultado Final</h2>
+                <p>Obtuviste ${score} de ${questions.length} puntos</p>
+                <p>Porcentaje de aciertos: ${percentage}%</p>
+                <p>${getFeedback(percentage)}</p>
+            `;
+            resultDiv.classList.remove('hidden');
+            
+            document.getElementById('submit').classList.add('hidden');
+            document.getElementById('restart').classList.remove('hidden');
+
+            // Deshabilitar las opciones
+            document.querySelectorAll('.option').forEach(option => {
+                option.style.pointerEvents = 'none';
+            });
+        }
+
+        function getFeedback(percentage) {
+            if (percentage === 100) return "¡Perfecto! 🌟 Eres un experto en Python!";
+            if (percentage >= 80) return "¡Muy bien! 🎉 Tienes un buen dominio de Python!";
+            if (percentage >= 60) return "¡Bien! 👍 Sigue practicando para mejorar.";
+            return "Sigue estudiando 📚 ¡Tú puedes mejorar!";
+        }
+
+        function restartQuiz() {
+            selectedAnswers.fill(-1);
+            document.querySelectorAll('.option').forEach(option => {
+                option.classList.remove('selected', 'correct', 'incorrect');
+                option.style.pointerEvents = 'auto';
+            });
+            document.querySelectorAll('.explanation').forEach(explanation => {
+                explanation.remove();
+            });
+            document.getElementById('result').classList.add('hidden');
+            document.getElementById('submit').classList.remove('hidden');
+            document.getElementById('restart').classList.add('hidden');
+        }
+
+        // Iniciar el quiz
+        createQuiz();
+    </script>
+</body>
+</html>
